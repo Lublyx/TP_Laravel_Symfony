@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ asset('styles/style.css') }}">
+    <title>{{ game.name }}</title>
+</head>
+<body>
+
+{{ include('/nav/component/header.html.twig', {pseudo: pseudo}) }}
+
+<div class="page">
+
+    <a href="/games" class="back-link">← Retour au catalogue</a>
+
+    <div class="game-hero">
+        <img src="{{ game.image }}" alt="{{ game.name }}">
+
+        <div class="game-info">
+            <h1 class="game-title">{{ game.name }}</h1>
+
+            <div class="game-tags">
+                {% for tag in game.tags %}
+                    <span class="tag">{{ tag }}</span>
+                {% endfor %}
+                <span class="tag">{{ game.mode }}</span>
+            </div>
+
+            <p class="game-desc">{{ game.description }}</p>
+
+            
+            <div class="game-price-block">
+                <div class="price-wrap">
+                    {% if game.old_price %}
+                        <span class="price-old">{{ game.old_price }} €</span>
+                    {% endif %}
+                    <span class="price-current {{ game.free ? 'free' }}">
+                        {{ game.free ? 'Gratuit' : game.price ~ ' €' }}
+                    </span>
+                </div>
+                {% if game.discount > 0 %}
+                    <span class="discount-badge">−{{ game.discount }}%</span>
+                {% endif %}
+                <button>Ajouter au panier</button>
+            </div>
+        </div>
+    </div>
+
+    <div>
+        <div class="section-title">
+            Commentaires
+            <span style="font-size:0.75rem;color:var(--text-dim);font-weight:400">
+                {{ comments|length }}
+            </span>
+        </div>
+
+        {% if pseudo %}
+        <form class="comment-form" method="POST" action="/games/{{ game.id }}/comment">
+            <textarea name="message" placeholder="Laisse un commentaire…" required></textarea>
+            <button type="submit">Publier</button>
+        </form>
+        {% else %}
+        <p style="color:var(--text-dim);font-size:0.82rem;padding:1rem 0">
+            <a href="/acceuil" style="color:var(--accent)">Connecte-toi</a> pour laisser un commentaire.
+        </p>
+        {% endif %}
+
+        <div class="comment-list" style="margin-top:1rem">
+            {% for comment in comments|reverse %}
+            <div class="comment-card">
+                <div class="comment-header">
+                    <span class="comment-pseudo">{{ comment.pseudo }}</span>
+                    <span class="comment-date">{{ comment.date }}</span>
+                </div>
+                <p class="comment-message">{{ comment.message }}</p>
+            </div>
+            {% else %}
+            <div class="no-comments">Aucun commentaire pour l'instant.</div>
+            {% endfor %}
+        </div>
+    </div>
+
+</div>
+
+</body>
+</html>

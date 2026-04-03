@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ asset('styles/style.css') }}">
+    <title>Jeux</title>
+</head>
+<body>
+
+{{ include('/nav/component/header.html.twig', {pseudo: pseudo}) }}
+
+<div class="layout">
+
+    <aside class="sidebar">
+
+        <div class="sidebar-block">
+            <div class="sidebar-block-title">Genres</div>
+            <ul class="filter-list">
+                {% for genre in ['Tous', 'FPS', 'Course', 'Simulation', 'Sport'] %}
+                <li>
+                    <a href="?search={{ filters.search }}&genre={{ genre }}&prix={{ filters.prix }}&mode={{ filters.mode }}&sort={{ filters.sort }}"
+                       class="{{ filters.genre == genre ? 'active' }}">
+                        <span class="filter-dot"></span>{{ genre }}
+                    </a>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <div class="sidebar-block">
+            <div class="sidebar-block-title">Prix</div>
+            <ul class="filter-list">
+                {% for p in ['Tous', 'Gratuit', 'Moins de 15', 'Moins de 30', 'En promo'] %}
+                <li>
+                    <a href="?search={{ filters.search }}&genre={{ filters.genre }}&prix={{ p }}&mode={{ filters.mode }}&sort={{ filters.sort }}"
+                       class="{{ filters.prix == p ? 'active' }}">
+                        <span class="filter-dot"></span>{{ p }}
+                    </a>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <div class="sidebar-block">
+            <div class="sidebar-block-title">Mode</div>
+            <ul class="filter-list">
+                {% for m in ['Tous', 'Solo', 'Multijoueur', 'Co-op'] %}
+                <li>
+                    <a href="?search={{ filters.search }}&genre={{ filters.genre }}&prix={{ filters.prix }}&mode={{ m }}&sort={{ filters.sort }}"
+                       class="{{ filters.mode == m ? 'active' }}">
+                        <span class="filter-dot"></span>{{ m }}
+                    </a>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+
+    </aside>
+
+        <main class="content">
+
+       
+        <form method="GET" action="/games" class="bg-top-bar">
+            
+            <input type="hidden" name="genre" value="{{ filters.genre }}">
+            <input type="hidden" name="prix"  value="{{ filters.prix }}">
+            <input type="hidden" name="mode"  value="{{ filters.mode }}">
+
+            <div class="top-bar">
+                <input type="text"
+                       name="search"
+                       value="{{ filters.search }}"
+                       placeholder="Rechercher un jeu… (Entrée pour valider)">
+                <select name="sort" onchange="this.form.submit()">
+                    <option value="popularite" {{ filters.sort == 'popularite' ? 'selected' }}>Popularité</option>
+                    <option value="price_asc"  {{ filters.sort == 'price_asc'  ? 'selected' }}>Prix ↑</option>
+                    <option value="price_desc" {{ filters.sort == 'price_desc' ? 'selected' }}>Prix ↓</option>
+                    <option value="discount"   {{ filters.sort == 'discount'   ? 'selected' }}>Meilleures promos</option>
+                </select>
+                <button type="submit">Rechercher</button>
+            </div>
+        </form>
+
+        <div class="results-header">
+            <span class="results-title">Catalogue</span>
+            <span class="results-count">{{ games|length }} jeu{{ games|length > 1 ? 's' }}</span>
+        </div>
+
+        <div class="game-list">
+            {% for game in games %}
+            <a href="/games/{{ game.id }}" class="game-row">
+                <img src="{{ game.image }}" alt="{{ game.name }}">
+                <div class="game-row-info">
+                    <div class="game-row-name">{{ game.name }}</div>
+                    <div class="game-row-desc">{{ game.description }}</div>
+                    <div class="game-row-tags">
+                        {% for tag in game.tags %}
+                            <span class="tag">{{ tag }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="game-row-price">
+                    {% if game.free %}
+                        <span class="price-final free">Gratuit</span>
+                    {% else %}
+                        {% if game.old_price %}
+                            <span class="price-original">{{ game.old_price }} €</span>
+                        {% endif %}
+                        <span class="price-final">{{ game.price }} €</span>
+                        {% if game.discount > 0 %}
+                            <span class="game-discount">−{{ game.discount }}%</span>
+                        {% endif %}
+                    {% endif %}
+                </div>
+            </a>
+            {% else %}
+            <div class="empty-state">
+                <p style="font-size:2rem;opacity:0.3">🎮</p>
+                <p>Aucun jeu ne correspond à ta recherche.</p>
+            </div>
+            {% endfor %}
+        </div>
+
+    </main>
+</div>
+
+</body>
+</html>
